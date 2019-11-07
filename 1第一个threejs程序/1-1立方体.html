@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<style>
+			canvas { width: 100%; height: 100% }
+			#showRect {
+				width: 500px;
+				height: 400px;
+			}
+		</style>
+		<script src="../js/three.js"></script>
+		<script src="../jquery-3.3.1.js"></script>
+	</head>
+	<body>
+		<div id="showRect"></div>
+		<script>
+			/*
+			1. 场景
+			2. 相机   透视相机    正投影相机
+			3. 渲染器
+			4. 几何体
+			*/ 
+			let scene = new THREE.Scene();
+			
+			let dombox = document.getElementById('showRect');
+			let domboxWidth = dombox.getBoundingClientRect().width;
+			let domboxHeight = dombox.getBoundingClientRect().height;
+			/** 透视相机
+			 * PerspectiveCamera( fov, aspect, near, far )
+				fov — 摄像机视锥体垂直视野角度Number
+				aspect — 摄像机视锥体长宽比Number
+				near — 摄像机视锥体近端面Number
+				far — 摄像机视锥体远端面Number
+			 */
+			let camera = new THREE.PerspectiveCamera(75, domboxWidth/domboxHeight, 1, 1000);
+			
+			let renderer = new THREE.WebGLRenderer();
+			renderer.setClearColor("#FFFFFF");
+			
+			renderer.setSize(domboxWidth, domboxHeight);
+			
+			dombox.appendChild(renderer.domElement);
+			
+			//4几何体
+			let geometry = new THREE.CubeGeometry(2, 2, 2);
+			
+			let material = new THREE.MeshBasicMaterial({color:0xff0000});
+			
+			let cube = new THREE.Mesh(geometry, material);
+			//scene.add(cube);
+			
+			//添加一个坐标系
+			let axisHelper = new THREE.AxisHelper(4);
+			//scene.add(axisHelper); // 这是单独写的时候,我们下面放到了Object3D中
+			
+			camera.position.z = 15;
+			camera.position.x = 5;
+			
+			//上面几何体 和 坐标系 是分开写的,动画都要写双份 ,, 我们把它整合为一个整体
+			var objectTotal = new THREE.Object3D();
+			objectTotal.add( cube );
+			objectTotal.add( axisHelper );
+			scene.add(objectTotal);
+			
+			
+			function render(){
+				requestAnimationFrame(render); //动画
+				
+				//用这个把 下面两个元素 整合到了一起!!
+				objectTotal.rotation.x += 0.01;
+				objectTotal.rotation.z += 0.01;
+				//cube.rotation.x += 0.01;
+				//cube.rotation.z += 0.01;
+				//axisHelper.rotation.x += 0.01; //坐标系也要跟着几何体移动
+				//axisHelper.rotation.z += 0.01;
+				
+				renderer.render(scene, camera);
+			}
+			
+			render();
+			
+		</script>
+	</body>
+</html>
